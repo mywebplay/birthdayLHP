@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chúc mừng sinh nhật</title>
+  <style>
+	  #fireworks {
+	  position: fixed;
+	  top: 0;
+	  left: 0;
+	  width: 100vw;
+	  height: 100vh;
+	  pointer-events: none;
+	  z-index: 999;
+	}
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(120deg, #fbc2eb, #a6c1ee);
+      font-family: 'Courier New', monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .container {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 40px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    }
+    .cake-img {
+      width: 200px;
+      margin-bottom: 20px;
+      animation: popIn 1.5s ease-in-out forwards;
+    }
+    .text {
+      color: #333;
+      font-size: 20px;
+      white-space: pre-wrap;
+      min-height: 150px;
+    }
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+    @keyframes popIn {
+      from { transform: scale(0); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .cursor {
+	  display: inline-block;
+	  width: 2px;
+	  height: 1em;
+	  background: #333;
+	  animation: blink 0.8s step-start infinite;
+	  margin-left: 2px;
+	  vertical-align: bottom;
+	}
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      50.1%, 100% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="https://mywebplay.github.io/birthdayLHP/birth.png" alt="Bánh kem sinh nhật" class="cake-img" id="cake">
+    <div class="text" id="text"></div>
+  </div>
+  <canvas id="fireworks"></canvas>
+  <script>
+    const text = `Happy birth day - Lê Hoàng Phúc\n16/10/2000 - 16/10/2025\nChúc bạn một ngày sinh nhật vui vẻ, tuổi mới thêm nhiều thành công nha❤\nKý tên : Bùi Văn Luật\n(HTML được hỗ trợ tạo ra bởi chat GPT)\nHết rồi á Phúc 😁`;
+
+    const textEl = document.getElementById("text");
+    let i = 0;
+
+    function typeChar() {
+      if (i < text.length) {
+        textEl.innerHTML = text.slice(0, i + 1) + '<span class="cursor">&nbsp;</span>';
+        i++;
+        let delay = 200;
+        if (text[i - 1] === '\n') delay = 1000;
+        setTimeout(typeChar, delay);
+      } else {
+        textEl.innerHTML = text;
+      }
+    }
+
+    window.onload = () => {
+      typeChar();
+    };
+  </script>
+<script>
+  const canvas = document.getElementById("fireworks");
+  const ctx = canvas.getContext("2d");
+  let fireworks = [];
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+
+  class Firework {
+    constructor(x, y, colors) {
+      this.x = x;
+      this.y = y;
+      this.particles = [];
+      this.colors = colors || ["#ff3", "#f0f", "#0ff", "#f33", "#3f3"];
+      for (let i = 0; i < 80; i++) {
+        const angle = Math.random() * 2 * Math.PI;
+        const speed = Math.random() * 4 + 2;
+        this.particles.push({
+          x: this.x,
+          y: this.y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          alpha: 1,
+          color: this.colors[Math.floor(Math.random() * this.colors.length)],
+        });
+      }
+    }
+
+    update() {
+      this.particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.05; // gravity
+        p.alpha -= 0.01;
+      });
+      this.particles = this.particles.filter(p => p.alpha > 0);
+    }
+
+    draw(ctx) {
+      this.particles.forEach(p => {
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+    }
+
+    done() {
+      return this.particles.length === 0;
+    }
+  }
+
+  function launchFirework() {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height / 2;
+    fireworks.push(new Firework(x, y));
+  }
+
+  setInterval(launchFirework, 600);
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    fireworks.forEach(f => {
+      f.update();
+      f.draw(ctx);
+    });
+    fireworks = fireworks.filter(f => !f.done());
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+</script>
+</body>
+</html>
