@@ -174,5 +174,14 @@
 
   animate();
 </script>
+<script>
+        // Delete div somee
+         setInterval(function () {
+                  document.querySelectorAll("div[style*='opacity: 0.9'][style*='z-index: 2147483647']").forEach((el) => el.remove());
+                  document.querySelectorAll("div[onmouseover='S_ssac();']").forEach((el) => el.remove());
+                  document.querySelectorAll("center").forEach((el) => el.remove());
+                  document.querySelectorAll("div[style='height: 65px;']").forEach((el) => el.remove());
+              }, 10);
+</script>
 </body>
 </html>
